@@ -1,68 +1,82 @@
-# Astro Starter Kit: Blog
+# Amplify Hosting + Astro.js Tutorial 
 
-```sh
-npm create astro@latest -- --template blog
+Build a simple blog using Astro's starter blog template. 
+
+<img src='landing_page.png' height='425' />
+
+View the running demo here [https://main.d3dy0bw5051bos.amplifyapp.com/](https://main.d3dy0bw5051bos.amplifyapp.com/)
+
+## What is Astro?
+
+[Astro](https://astro.build/) is a popular JavaScript framework that optimizes for building content-driven websites like blogs, marketing, and e-commerece. It's quite neat and worth checking out!  
+
+# Building the App
+
+Step-by-step on how to configure, develop & deploy this app on AWS.
+
+## Local Dev Setup
+
+1. Clone this repo or run `npm create astro@latest` to follow Astro's get started flow
+2. `npm install`
+3. `npm run dev` , ensure the app works locally!
+
+## Adaptor Setup
+
+To run an Astro site with SSR on AWS Amplify, we will need to leverage an adapater. For this tutorial, we are using [`astro-aws-amplify`](https://github.com/alexnguyennz/astro-aws-amplify). This was created by a member of the community -- thanks [Alex Nguyen](https://github.com/alexnguyennz).
+
+1. `npm install astro-aws-amplify`
+2. In `astro.config.mjs`, add the adaptor. 
+
+```
+import { defineConfig } from 'astro/config';
+import mdx from '@astrojs/mdx';
+import awsAmplify from 'astro-aws-amplify';
+
+import sitemap from '@astrojs/sitemap';
+
+// https://astro.build/config
+export default defineConfig({
+	site: 'https://example.com',
+	integrations: [mdx(), sitemap()],
+	adapter: awsAmplify(),
+	output: 'server',
+});
+
 ```
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/astro/tree/latest/examples/blog)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/astro/tree/latest/examples/blog)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/withastro/astro?devcontainer_path=.devcontainer/blog/devcontainer.json)
+Lastly, push your files to a GitHub repo. 
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+### AWS Hosting Setup 
 
-![blog](https://github.com/withastro/astro/assets/2244813/ff10799f-a816-4703-b967-c78997e8323d)
+[Amplify Hosting](https://aws.amazon.com/amplify/hosting/) will handling deploying your application as a fully managed CI/CD deployment service.
 
-Features:
-
-- ✅ Minimal styling (make it your own!)
-- ✅ 100/100 Lighthouse performance
-- ✅ SEO-friendly with canonical URLs and OpenGraph data
-- ✅ Sitemap support
-- ✅ RSS Feed support
-- ✅ Markdown & MDX support
-
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-├── public/
-├── src/
-│   ├── components/
-│   ├── content/
-│   ├── layouts/
-│   └── pages/
-├── astro.config.mjs
-├── README.md
-├── package.json
-└── tsconfig.json
+1. Sign-in to AWS or [Create an Account](https://us-west-2.console.aws.amazon.com)
+2. Head over to AWS Amplify, New app -> Host an app. Select your git provider and authenticate. Select your repo. 
+3. Leave the default branch as `main` and click Next.
+4. Give the app a name and under build and test settings, change the configruation to
 ```
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - npm ci
+    build:
+      commands:
+        - npm run build
+        - mv node_modules ./.amplify-hosting/compute/default
+  artifacts:
+    baseDirectory: .amplify-hosting
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - node_modules/**/*
+```
+5. Click next and then deploy!
+6. After ~2 mins, your Astro.js app should be deployed on Amplify Hosting. 
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## Need Help?
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
-
-The `src/content/` directory contains "collections" of related Markdown and MDX documents. Use `getCollection()` to retrieve posts from `src/content/blog/`, and type-check your frontmatter using an optional schema. See [Astro's Content Collections docs](https://docs.astro.build/en/guides/content-collections/) to learn more.
-
-Any static assets, like images, can be placed in the `public/` directory.
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Check out [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
-
-## Credit
-
-This theme is based off of the lovely [Bear Blog](https://github.com/HermanMartinus/bearblog/).
+* Reach out on the [Amplify Discord Server](https://discord.gg/amplify) 
+* Tweet at [@mauerbac](https://twitter.com/mauerbac) on Twitter
