@@ -1,4 +1,4 @@
-# Amplify Hosting + Astro.js Tutorial 
+# Astro.js + Amplify Hosting Tutorial 
 
 Build a simple blog using Astro's starter blog template. 
 
